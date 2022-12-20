@@ -39,9 +39,8 @@ function extractTransaction(val) {
 }
 
 function crawl() {
-    var _export = "";
-    var data = JSON.parse($( '#__NEXT_DATA__' )[0].innerHTML);
-    var data = data['props']['pageProps']['middlewareProps']['m5']['initialQueryResult'];
+    var rawData = JSON.parse($( '#__NEXT_DATA__' )[0].innerHTML);
+    var data = rawData['props']['pageProps']['middlewareProps']['m5']['initialQueryResult'];
 
     var transactions = [];
     jQuery.each(data, function(idx, val) {
