@@ -15,22 +15,25 @@ function exportCSV(transactions) {
     var csv = transactions.map(function(row){
         return fields.map(function(fieldName){
             return JSON.stringify(row[fieldName])
-        }).join(',')
+        }).join(' , ')
     });
-    csv.unshift(fields.join(',')) // add header column
+    csv.unshift(fields.join(' , ')) // add header column
     csv = csv.join('\r\n');
     console.log(csv)
 }
 
+function fmt(num) {
+    return parseFloat(num).toFixed(2);
+}
+
 function extractTransaction(val) {
     return {
-        amount: val['amount'] || 0.0,
+        amount: fmt(val['amount'] || 0.0),
         currency: val['currency'] || '',
         description: val['description'] || '',
         dateTime: val['lastEventDateTime'] || '',
         isin: val['relatedIsin'] || val['isin'] || '',
-        quantity: val['quantity'] || 0,
-        status: val['status'] || 'CANCELLED',
+        quantity: fmt(val['quantity'] || 0),
         type: val['side'] || val['cashTransactionType'] || ''
     };
 }
@@ -42,9 +45,8 @@ function crawl() {
 
     var transactions = [];
     jQuery.each(data, function(idx, val) {
-        var transaction = extractTransaction(val);
-        if (transaction.status == "SETTLED") {           
-             transactions.push(transaction);
+        if (val['status'] == "SETTLED") {           
+             transactions.push(extractTransaction(val));
         }
     });
 
