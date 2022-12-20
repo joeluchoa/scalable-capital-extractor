@@ -10,16 +10,26 @@ function loadJQuery() {
     document.getElementsByTagName('head')[0].appendChild(file);
 }
 
+function exportCSV(transactions) {
+    var fields = Object.keys(transactions[0])
+    var csv = transactions.map(function(row){
+        return fields.map(function(fieldName){
+            return JSON.stringify(row[fieldName])
+        }).join(',')
+    });
+    csv.unshift(fields.join(',')) // add header column
+    csv = csv.join('\r\n');
+    console.log(csv)
+}
+
 function extractTransaction(val) {
     return {
-        id: val['id'],
         amount: val['amount'] || 0.0,
         currency: val['currency'] || '',
         description: val['description'] || '',
         dateTime: val['lastEventDateTime'] || '',
         isin: val['relatedIsin'] || val['isin'] || '',
         quantity: val['quantity'] || 0,
-        securityTransactionType: val['securityTransactionType'] || '',
         status: val['status'] || 'CANCELLED',
         type: val['side'] || val['cashTransactionType'] || ''
     };
@@ -30,14 +40,15 @@ function crawl() {
     var data = JSON.parse($( '#__NEXT_DATA__' )[0].innerHTML);
     var data = data['props']['pageProps']['middlewareProps']['m5']['initialQueryResult'];
 
+    var transactions = [];
     jQuery.each(data, function(idx, val) {
         var transaction = extractTransaction(val);
         if (transaction.status == "SETTLED") {           
-             console.log(transaction);   
+             transactions.push(transaction);
         }
     });
 
-    return true;
+    exportCSV(transactions);
 }
 
 if (!window.jQuery) {  
